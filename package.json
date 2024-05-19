@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "generate": "node generate.js"
+    "generate": "node generate.js",
+    "bundle": "esbuild --bundle --global-name=GraphFromOSM index.js --outfile=docs/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,9 @@
   },
   "homepage": "https://github.com/MatveiT/GraphFromOSM#readme",
   "dependencies": {
-    "axios": "^0.21.1"
+    "axios": "^1.6.8"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.3"
   }
 }

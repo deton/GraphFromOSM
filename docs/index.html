@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Graph From OSM</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+	integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+	crossorigin=""/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@jonatanheyman/leaflet-areaselect@1.2.0/src/leaflet-areaselect.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+	integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+	crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/@jonatanheyman/leaflet-areaselect@1.2.0/src/leaflet-areaselect.js"></script>
+  <style type="text/css">
+	body {
+	  padding: 0;
+	  margin: 0;
+	}
+	#map {
+	  width: 100%;
+	  height: 100vh;
+	}
+	#toolbar {
+	  position: absolute;
+	  top: 5px;
+	  left: 60px;
+	  z-index: 1000;
+	}
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="toolbar" class="leaflet-control">
+	<a id="exportGeojson"><button id="exportGeojsonButton">Generate network.geojson</button></a>
+  </div>
+
+<script src="bundle.js"></script>
+<script>
+var map = L.map('map');
+L.tileLayer('https://tile.openstreetmap.jp/styles/osm-bright/{z}/{x}/{y}.png', {
+    attribution: '<a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
+}).addTo(map);
+
+const urlParams = new URLSearchParams(document.location.search);
+// bbox=<westLng>,<southLat>,<eastLng>,<northLat>
+let bboxParam = urlParams.get('bbox') || '139.7688,35.6970,139.7761,35.7031';
+let bbox = bboxParam.split(',').map(s => Number(s));
+
+var areaSelect = L.areaSelect().addTo(map);
+areaSelect.setBounds(L.latLngBounds([[bbox[1], bbox[0]], [bbox[3], bbox[2]]]));
+
+const generateData = async (settings) => {
+  const t0 = new Date();
+  console.log('Graph-From-OSM is generating data ...\n')
+
+  // 1) OSM query --------------------------------------------------------------
+  console.log('   - OSM query sended ...')
+  let t1 = new Date();
+  const data = await GraphFromOSM.getOsmData(settings);
+  let t2 = new Date();
+  console.log('   - OSM data recieved (' + ((t2-t1)/1000) +' s).')
+
+  // 2) OSM to graph -----------------------------------------------------------
+  console.log('   - Processing of OSM data to graph ...')
+  let t3 = new Date();
+  const graph = GraphFromOSM.osmDataToGraph(data);
+  let t4 = new Date();
+  console.log('   - Processing done (' + ((t4-t3)/1000) +' s).')
+
+  console.log('Graph-From-OSM Run Done in ' + ((t4-t0)/1000) + ' seconds.')
+  console.log('Data source: https://overpass-api.de/api/interpreter')
+  console.log('Copyright: The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.')
+  return graph;
+}
+
+var CONFIG = {
+  "highways": "ALL",
+  "timeout": 10000,
+  "maxContentLength": 10737418,
+};
+const exportGeojsonButton = document.getElementById("exportGeojsonButton");
+const exportGeojsonElem = document.getElementById("exportGeojson");
+exportGeojsonButton.addEventListener("click", () => {
+  const bounds = areaSelect.getBounds();
+  console.log(`bbox=${bounds.toBBoxString()}`);
+  generateData({
+    "bbox": [
+      bounds.getWest(),
+      bounds.getSouth(),
+      bounds.getEast(),
+      bounds.getNorth(),
+    ],
+    ...CONFIG,
+  }).then(graph => {
+    const file = new File([JSON.stringify(graph)], 'network.geojson', {
+      type: 'application/geo+json'
+    });
+    exportGeojsonElem.href = URL.createObjectURL(file);
+    exportGeojsonElem.download = file.name;
+    exportGeojsonElem.click();
+    URL.revokeObjectURL(exportGeojsonElem.href);
+  }).catch(console.error);
+});
+</script>
+</body>
+</html>
