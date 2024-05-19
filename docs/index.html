@@ -83,15 +83,17 @@ const exportGeojsonElem = document.getElementById("exportGeojson");
 exportGeojsonButton.addEventListener("click", () => {
   const bounds = areaSelect.getBounds();
   console.log(`bbox=${bounds.toBBoxString()}`);
+  const bbox = [
+    bounds.getWest(),
+    bounds.getSouth(),
+    bounds.getEast(),
+    bounds.getNorth(),
+  ];
   generateData({
-    "bbox": [
-      bounds.getWest(),
-      bounds.getSouth(),
-      bounds.getEast(),
-      bounds.getNorth(),
-    ],
+    "bbox": bbox,
     ...CONFIG,
   }).then(graph => {
+    graph.metaData.generatingBbox = bbox;
     const file = new File([JSON.stringify(graph)], 'network.geojson', {
       type: 'application/geo+json'
     });
