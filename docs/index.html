@@ -6,11 +6,13 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
 	integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
 	crossorigin=""/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@jonatanheyman/leaflet-areaselect@1.2.0/src/leaflet-areaselect.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
 	integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
 	crossorigin=""></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@jonatanheyman/leaflet-areaselect@1.2.0/src/leaflet-areaselect.css"/>
   <script src="https://cdn.jsdelivr.net/npm/@jonatanheyman/leaflet-areaselect@1.2.0/src/leaflet-areaselect.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
   <style type="text/css">
 	body {
 	  padding: 0;
@@ -44,10 +46,16 @@ L.tileLayer('https://tile.openstreetmap.jp/styles/osm-bright/{z}/{x}/{y}.png', {
 const urlParams = new URLSearchParams(document.location.search);
 // bbox=<westLng>,<southLat>,<eastLng>,<northLat>
 let bboxParam = urlParams.get('bbox') || '139.7688,35.6970,139.7761,35.7031';
-let bbox = bboxParam.split(',').map(s => Number(s));
+let bbox = bboxParam.split(',').map(Number);
 
 var areaSelect = L.areaSelect().addTo(map);
 areaSelect.setBounds(L.latLngBounds([[bbox[1], bbox[0]], [bbox[3], bbox[2]]]));
+
+L.Control.geocoder({
+  defaultMarkGeocode: false
+}).on('markgeocode', ev => {
+  map.panTo(ev.geocode.center);
+}).addTo(map);
 
 const generateData = async (settings) => {
   const t0 = new Date();
