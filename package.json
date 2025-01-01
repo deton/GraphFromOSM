@@ -1,6 +1,6 @@
 {
   "name": "graph-from-osm",
-  "version": "1.0.0",
+  "version": "1.0.0+deton001",
   "description": "JavaScript minimalistic module to import data from OSM and transform it into geoJSON-format graph structured data.",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MatveiT/GraphFromOSM.git"
+    "url": "git+https://github.com/deton/GraphFromOSM.git"
   },
   "keywords": [
     "graph",
@@ -21,15 +21,15 @@
     "routing"
   ],
   "author": "Matsvei Tsishyn",
+  "contributors": [
+    "KIHARA, Hideto"
+  ],
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/MatveiT/GraphFromOSM/issues"
+    "url": "https://github.com/deton/GraphFromOSM/issues"
   },
-  "homepage": "https://github.com/MatveiT/GraphFromOSM#readme",
-  "dependencies": {
-    "axios": "^1.6.8"
-  },
+  "homepage": "https://github.com/deton/GraphFromOSM#readme",
   "devDependencies": {
-    "esbuild": "^0.21.3"
+    "esbuild": "^0.24.2"
   }
 }

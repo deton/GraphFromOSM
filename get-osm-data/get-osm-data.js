@@ -1,4 +1,3 @@
-const axios = require('axios');
 const { generateOsmScript } = require('./generate-osm-script.js');
 
 
@@ -15,16 +14,15 @@ Output: OSM data
 
 const getOsmData = async (settings) => {
   const osmScript = generateOsmScript(settings);
-  const response = await axios.request({
-    url: 'https://overpass-api.de/api/interpreter',
+  const response = await fetch('https://overpass-api.de/api/interpreter', {
     method: 'post',
     headers: { Accept: 'application/json' },
-    data: osmScript,
-    timeout: settings.timeout,
-    maxContentLength: settings.maxContentLength
+    body: osmScript,
+    signal: AbortSignal.timeout(settings.timeout),
   })
-  response.data.generatingScript = osmScript;
-  return response.data;
+  const data = await response.json();
+  data.generatingScript = osmScript;
+  return data;
 }
 
 
