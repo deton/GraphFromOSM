@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate": "node generate.js",
-    "bundle": "esbuild --bundle --global-name=GraphFromOSM index.js --outfile=docs/bundle.js"
+    "bundle": "esbuild --bundle --format=esm index.js --outfile=docs/graph-from-osm.js"
   },
   "repository": {
     "type": "git",
