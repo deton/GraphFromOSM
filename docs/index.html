@@ -36,7 +36,17 @@
 	<a id="exportGeojson"><button id="exportGeojsonButton">Generate network.geojson</button></a>
   </div>
 
-<script src="bundle.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "graph-from-osm": "./graph-from-osm.js"
+  }
+}
+</script>
+<script type="module">
+import GraphFromOSM from 'graph-from-osm';
+window.GraphFromOSM = GraphFromOSM;
+</script>
 <script>
 var map = L.map('map');
 L.tileLayer('https://tile.openstreetmap.jp/styles/osm-bright/{z}/{x}/{y}.png', {
